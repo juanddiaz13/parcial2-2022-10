@@ -597,16 +597,9 @@ const API_ESP= [
   }
  ];
 
- const data = [
-  { item: 'Redmi', count: 490 },
-  { item: 'Huawei', count: 291 },
-  { item: 'IPhone', count: 348 },
-  { item: 'Samsung', count: 245 },
-  { item: 'Pixel', count: 50 },
-];
-
 export const Bar = (data) => {
-  console.log(data.data)
+
+  let dataAct = data.data;
  
   useEffect(() => {
     
@@ -636,11 +629,11 @@ const y = d3.scaleLinear()
     .range([iheight, 0]);
 
 const x = d3.scaleBand()
-.domain(data.map(d => d.name) ) 
+.domain(dataAct.map(d => d.name) ) 
 .range([0, iwidth])
 .padding(0.1); 
 
-const bars = g.selectAll("rect").data(data);
+const bars = g.selectAll("rect").data(dataAct);
 
 // Tooltip
 const tooldiv = d3
