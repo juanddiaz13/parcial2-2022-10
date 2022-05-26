@@ -1,12 +1,8 @@
-import { LOCALES } from './i18n/locales';
-import React, { useState } from 'react';
-import { IntlProvider } from 'react-intl';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import messages from './i18n/messages';
-import { NavBar } from './shared/components/NavBar';
-import { PokemonList } from './pages/pokemon-list/PokemonList';
-import './App.scss';
-import { Bar } from './pages/pokemon-list/bar-chart';
+import React, { useEffect, useState } from 'react';
+import * as d3 from 'd3';
+import './PokemonList.scss';
+
+
 
 const API_EN = [
   {
@@ -601,37 +597,103 @@ const API_ESP= [
   }
  ];
 
-function App() {
-  const [language, setLanguage] = useState(LOCALES.SPANISH);
-  let lenguaje = API_EN;
-  let local = navigator.language
-  if(local=='es'){
-    lenguaje=API_ESP;
-  }
-  if(local=='en'){
-    lenguaje=API_EN;
-  }
+ const data = [
+  { item: 'Redmi', count: 490 },
+  { item: 'Huawei', count: 291 },
+  { item: 'IPhone', count: 348 },
+  { item: 'Samsung', count: 245 },
+  { item: 'Pixel', count: 50 },
+];
+
+export const Bar = (data) => {
+  console.log(data.data)
+ 
+  useEffect(() => {
+    
+    const canvas = d3.select("#canvas");
+    const width = 700;
+    const height = 500;
+    const margin = { top:10, left:50, bottom: 40, right: 10};
+    const iwidth = width - margin.left - margin.right;
+    const iheight = height - margin.top -margin.bottom;
+
+const svg = canvas.append("svg");
+svg.attr("width", width);
+svg.attr("height", height);
+
+let g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+
+const colors = d3.scaleOrdinal([
+    '#ffa822',
+    '#134e6f',
+    '#ff6150',
+    '#1ac0c6',
+    '#dee0e6',
+  ]);
+
+const y = d3.scaleLinear() 
+    .domain([0, height])
+    .range([iheight, 0]);
+
+const x = d3.scaleBand()
+.domain(data.map(d => d.name) ) 
+.range([0, iwidth])
+.padding(0.1); 
+
+const bars = g.selectAll("rect").data(data);
+
+// Tooltip
+const tooldiv = d3
+.select('#canvas')
+.append('div')
+.style('visibility', 'hidden')
+.style('position', 'absolute')
+.style('background-color', 'gray');
+
+bars.enter().append("rect")
+.attr("class", "bar")
+.attr('fill', (d, i) => colors(i))
+.on('mouseover', (e, d) => {
+    console.log(e);
+    console.log(`${d.name}` + "esto es d.data");
+    tooldiv
+      .style('visibility', 'visible')
+      .text(`${d.name}:` + `${d.height}`);
+  })
+  .on('mousemove', (e, d) => {
+    tooldiv
+      .style('top', e.pageY - 50 + 'px')
+      .style('left', e.pageX - 50 + 'px');
+  })
+  .on('mouseout', () => {
+    tooldiv.style('visibility', 'hidden');
+  })
+
+
+
+.attr("x", d => x(d.name))
+.attr("y", d => y(d.height))
+.attr("height", d => iheight - y(d.height))
+.attr("width", x.bandwidth());
+
+
+g.append("g")
+.classed("x--axis", true)
+.call(d3.axisBottom(x))
+.attr("transform", `translate(0, ${iheight})`);  
+
+g.append("g")
+.classed("y--axis", true)
+.call(d3.axisLeft(y));
+
+
+
+  });
+
   return (
     <>
-      <IntlProvider locale={language} messages={messages[language]}>
-        <Router>
-          <NavBar></NavBar>
-          <Routes>
-            <Route exact path='/' element={<PokemonList></PokemonList>} />
-            <Route exact path='/report' element={<Bar data={lenguaje}></Bar>} />
-            <Route
-              path='*'
-              element={
-                <main style={{ padding: '1rem' }}>
-                  <p>There's nothing here!</p>
-                </main>
-              }
-            />
-          </Routes>
-        </Router>
-      </IntlProvider>
+    <div id="canvas"></div>
+    HOLAAAAAA
     </>
   );
-}
-
-export default App;
+};
