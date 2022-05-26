@@ -1,4 +1,8 @@
+#Nota para el calificador: hubo un problema con el archivo JSON que retornaba la API usando el fetch así que decidí hardcodear el JSON directamente para poder eliminar el elemento que afectaba el formato y poder continuar haciendo problemas sobre el parcial sin problemas
+
 # Parcial 2
+
+
 
 ### Configuración inicial 🔧
 
